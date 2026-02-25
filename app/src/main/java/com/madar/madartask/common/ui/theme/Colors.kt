@@ -1,4 +1,4 @@
-package com.madar.madartask.ui.theme
+package com.madar.madartask.common.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,15 +1,16 @@
-package com.madar.madartask.ui.navigation
+package com.madar.madartask.common.ui.navigation
 
 import com.madar.madartask.ui.input.InputScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.madar.madartask.common.constants.AppConstants
 import com.madar.madartask.ui.display.DisplayScreen
 
 sealed class Screen(val route: String) {
-    object Input : Screen("input_screen")
-    object Display : Screen("display_screen")
+    object Input : Screen(AppConstants.INPUT_SCREEN_ROUTE)
+    object Display : Screen(AppConstants.DISPLAY_SCREEN_ROUTE)
 }
 
 @Composable
