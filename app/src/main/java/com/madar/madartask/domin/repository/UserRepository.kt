@@ -1,6 +1,5 @@
 package com.madar.madartask.domin.repository
 
-import com.madar.madartask.data.local.dao.UserDao
 import com.madar.madartask.domin.model.User
 
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +11,7 @@ interface UserRepository {
 
     suspend fun deleteUser(user: User)
 
-    //fun getAllUsers(): Flow<List<User>>
+    fun getAllUsers(): Flow<List<User>>
 
     suspend fun getUserById(userId: Int): User?
 
