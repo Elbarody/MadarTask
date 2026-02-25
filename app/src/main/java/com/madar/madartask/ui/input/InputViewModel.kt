@@ -47,7 +47,10 @@ class InputViewModel @Inject constructor(
     }
 
     private fun validateName(name: String): String? {
-        return if (name.isBlank()) context.getString(R.string.error_name_required) else null
+        if (name.isBlank()) return context.getString(R.string.error_name_required)
+        if (name.any { it.isDigit() }) return context.getString(R.string.error_name_no_numbers)
+        if (name.any { !it.isLetter() && !it.isWhitespace() }) return context.getString(R.string.error_name_no_special_chars)
+        return null
     }
 
     private fun validateAge(age: String): String? {
@@ -60,7 +63,10 @@ class InputViewModel @Inject constructor(
     }
 
     private fun validateJob(job: String): String? {
-        return if (job.isBlank()) context.getString(R.string.error_job_required) else null
+        if (job.isBlank()) return context.getString(R.string.error_job_required)
+        if (job.any { it.isDigit() }) return context.getString(R.string.error_job_no_numbers)
+        if (job.any { !it.isLetter() && !it.isWhitespace() }) return context.getString(R.string.error_job_no_special_chars)
+        return null
     }
 
     private fun saveUser() = viewModelScope.launch {

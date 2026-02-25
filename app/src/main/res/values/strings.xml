@@ -9,10 +9,14 @@
     <string name="button_save">Save</string>
     <string name="button_view_users">View Users</string>
     <string name="error_name_required">Name is required</string>
+    <string name="error_name_no_numbers">Name cannot contain numbers</string>
+    <string name="error_name_no_special_chars">Name cannot contain special characters</string>
     <string name="error_age_required">Age is required</string>
     <string name="error_age_must_be_number">Age must be a number</string>
     <string name="error_age_range">Age must be between %1$d and %2$d</string>
     <string name="error_job_required">Job title is required</string>
+    <string name="error_job_no_numbers">Job title cannot contain numbers</string>
+    <string name="error_job_no_special_chars">Job title cannot contain special characters</string>
     <string name="gender_male">Male</string>
     <string name="gender_female">Female</string>
     <string name="toast_user_saved">User saved successfully</string>
