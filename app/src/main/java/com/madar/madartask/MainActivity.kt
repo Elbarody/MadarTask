@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.rememberNavController
-import com.madar.madartask.ui.navigation.NavGraph
-import com.madar.madartask.ui.theme.MadarTaskTheme
+import com.madar.madartask.common.ui.navigation.NavGraph
+import com.madar.madartask.common.ui.theme.MadarTaskTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
