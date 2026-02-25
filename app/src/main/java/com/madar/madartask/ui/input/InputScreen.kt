@@ -7,18 +7,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,10 +29,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.madar.madartask.R
 import com.madar.madartask.common.constants.Gender
+import com.madar.madartask.common.ui.theme.AppColors
 import com.madar.madartask.common.ui.theme.AppTypography
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,14 +48,14 @@ fun InputScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.effect.collect {
-            when (it) {
-                InputEffect.ShowSuccess ->
-                    Toast.makeText(context, "User saved successfully", Toast.LENGTH_SHORT).show()
-
-                is InputEffect.ShowError ->
-                    Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                InputEffect.ShowSuccess -> {
+                    Toast.makeText(context, R.string.toast_user_saved, Toast.LENGTH_SHORT).show()
+                }
+                is InputEffect.ShowError -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
                 InputEffect.NavigateToUsers -> onNavigateToDisplay()
             }
         }
@@ -59,7 +63,19 @@ fun InputScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Add User", style = AppTypography.titleLarge) })
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.input_screen_title),
+                        style = AppTypography.titleLarge,
+                        color = AppColors.onSurface
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.surface,
+                    titleContentColor = AppColors.onSurface
+                )
+            )
         }
     ) { padding ->
         Column(
@@ -68,17 +84,22 @@ fun InputScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-
             OutlinedTextField(
                 value = state.name,
                 onValueChange = { viewModel.onEvent(InputEvent.NameChanged(it)) },
-                label = { Text("Name") },
+                label = {
+                    Text(
+                        text = stringResource(id = R.string.label_name),
+                        style = AppTypography.labelMedium
+                    )
+                },
                 isError = state.nameError != null,
                 supportingText = {
-                    if (state.nameError != null) {
+                    state.nameError?.let { error ->
                         Text(
-                            text = state.nameError!!,
-                            color = MaterialTheme.colorScheme.error
+                            text = error,
+                            style = AppTypography.bodyLarge,
+                            color = AppColors.error
                         )
                     }
                 },
@@ -88,14 +109,20 @@ fun InputScreen(
             OutlinedTextField(
                 value = state.age,
                 onValueChange = { viewModel.onEvent(InputEvent.AgeChanged(it)) },
-                label = { Text("Age") },
+                label = {
+                    Text(
+                        text = stringResource(id = R.string.label_age),
+                        style = AppTypography.labelMedium
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = state.ageError != null,
                 supportingText = {
-                    if (state.ageError != null) {
+                    state.ageError?.let { error ->
                         Text(
-                            text = state.ageError!!,
-                            color = MaterialTheme.colorScheme.error
+                            text = error,
+                            style = AppTypography.bodyLarge,
+                            color = AppColors.error
                         )
                     }
                 },
@@ -105,13 +132,19 @@ fun InputScreen(
             OutlinedTextField(
                 value = state.job,
                 onValueChange = { viewModel.onEvent(InputEvent.JobChanged(it)) },
-                label = { Text("Job Title") },
+                label = {
+                    Text(
+                        text = stringResource(id = R.string.label_job_title),
+                        style = AppTypography.labelMedium
+                    )
+                },
                 isError = state.jobError != null,
                 supportingText = {
-                    if (state.jobError != null) {
+                    state.jobError?.let { error ->
                         Text(
-                            text = state.jobError!!,
-                            color = MaterialTheme.colorScheme.error
+                            text = error,
+                            style = AppTypography.bodyLarge,
+                            color = AppColors.error
                         )
                     }
                 },
@@ -120,25 +153,38 @@ fun InputScreen(
 
             GenderDropdown(
                 selected = state.gender,
-                onSelected = {
-                    viewModel.onEvent(InputEvent.GenderChanged(it))
-                }
+                onSelected = { viewModel.onEvent(InputEvent.GenderChanged(it)) }
             )
 
             Button(
                 onClick = { viewModel.onEvent(InputEvent.SaveClicked) },
                 enabled = !state.isLoading && state.isFormValid,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = AppColors.primary,
+                    contentColor = AppColors.onPrimary,
+                    disabledContainerColor = AppColors.onSurfaceVariant.copy(alpha = 0.38f),
+                    disabledContentColor = AppColors.onSurfaceVariant.copy(alpha = 0.38f)
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (state.isLoading) CircularProgressIndicator()
-                else Text("Save")
+                if (state.isLoading) {
+                    CircularProgressIndicator(color = AppColors.onPrimary)
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.button_save),
+                        style = AppTypography.labelMedium
+                    )
+                }
             }
 
             OutlinedButton(
                 onClick = { viewModel.onEvent(InputEvent.ViewUsersClicked) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("View Users")
+                Text(
+                    text = stringResource(id = R.string.button_view_users),
+                    style = AppTypography.labelMedium
+                )
             }
         }
     }
@@ -146,27 +192,33 @@ fun InputScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GenderDropdown(
+private fun GenderDropdown(
     selected: Gender,
     onSelected: (Gender) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val genders = Gender.entries.toTypedArray()
+    val context = LocalContext.current
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it }
     ) {
         OutlinedTextField(
-            value = selected.label,
+            value = selected.getLabel(context),
             onValueChange = {},
             readOnly = true,
-            label = { Text("Gender") },
+            label = {
+                Text(
+                    text = stringResource(id = R.string.label_gender),
+                    style = AppTypography.labelMedium
+                )
+            },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded)
             },
             modifier = Modifier
-                .menuAnchor(type=MenuAnchorType.PrimaryEditable, enabled = true)
+                .menuAnchor(type = MenuAnchorType.PrimaryEditable, enabled = true)
                 .fillMaxWidth()
         )
 
@@ -176,7 +228,12 @@ fun GenderDropdown(
         ) {
             genders.forEach { gender ->
                 DropdownMenuItem(
-                    text = { Text(gender.label) },
+                    text = {
+                        Text(
+                            text = gender.getLabel(context),
+                            style = AppTypography.bodyLarge
+                        )
+                    },
                     onClick = {
                         onSelected(gender)
                         expanded = false

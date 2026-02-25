@@ -1,3 +1,41 @@
 <resources>
     <string name="app_name">Madar Task</string>
+
+    <string name="input_screen_title">Add User</string>
+    <string name="label_name">Name</string>
+    <string name="label_age">Age</string>
+    <string name="label_job_title">Job Title</string>
+    <string name="label_gender">Gender</string>
+    <string name="button_save">Save</string>
+    <string name="button_view_users">View Users</string>
+    <string name="error_name_required">Name is required</string>
+    <string name="error_age_required">Age is required</string>
+    <string name="error_age_must_be_number">Age must be a number</string>
+    <string name="error_age_range">Age must be between %1$d and %2$d</string>
+    <string name="error_job_required">Job title is required</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="toast_user_saved">User saved successfully</string>
+    <string name="toast_error_generic">Error</string>
+    <string name="display_screen_title">All Users (%1$d)</string>
+    <string name="empty_state_title">No users found</string>
+    <string name="button_add_first_user">Add First User</string>
+    <string name="button_add_user">Add User</string>
+    <string name="button_delete_all">Delete All</string>
+    <string name="user_detail_age">Age: %1$s</string>
+    <string name="user_detail_job">Job: %1$s</string>
+    <string name="user_detail_gender">Gender: %1$s</string>
+    <string name="dialog_delete_user_title">Delete User</string>
+    <string name="dialog_delete_user_message">Are you sure you want to delete %1$s?</string>
+    <string name="dialog_delete_all_title">Delete All Users</string>
+    <string name="dialog_delete_all_message">Are you sure you want to delete all users? This action cannot be undone.</string>
+    <string name="button_delete">Delete</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="toast_user_deleted">%1$s deleted</string>
+    <string name="toast_users_deleted">%1$d users deleted</string>
+    <string name="toast_error_unknown">Unknown error</string>
+    <string name="toast_error_delete_failed">Failed to delete</string>
+    <string name="toast_error_delete_all_failed">Failed to delete all</string>
+    <string name="content_desc_delete_user">Delete user</string>
+    <string name="content_desc_loading">Loading</string>
 </resources>

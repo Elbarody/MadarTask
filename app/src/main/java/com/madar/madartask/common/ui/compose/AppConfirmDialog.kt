@@ -1,10 +1,12 @@
 package com.madar.madartask.common.ui.compose
 
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.madar.madartask.R
+import com.madar.madartask.common.ui.theme.AppColors
 import com.madar.madartask.common.ui.theme.AppTypography
 
 @Composable
@@ -12,7 +14,7 @@ fun AppConfirmDialog(
     title: String,
     message: String,
     confirmText: String,
-    dismissText: String = "Cancel",
+    dismissText: String = stringResource(id = R.string.button_cancel),
     isDestructive: Boolean = false,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
@@ -22,13 +24,15 @@ fun AppConfirmDialog(
         title = {
             Text(
                 text = title,
-                style = AppTypography.titleLarge
+                style = AppTypography.titleLarge,
+                color = AppColors.onSurface
             )
         },
         text = {
             Text(
                 text = message,
-                style = AppTypography.bodyLarge
+                style = AppTypography.bodyLarge,
+                color = AppColors.onSurfaceVariant
             )
         },
         confirmButton = {
@@ -36,10 +40,7 @@ fun AppConfirmDialog(
                 Text(
                     text = confirmText,
                     style = AppTypography.labelMedium,
-                    color = if (isDestructive)
-                        MaterialTheme.colorScheme.error
-                    else
-                        MaterialTheme.colorScheme.primary
+                    color = if (isDestructive) AppColors.error else AppColors.primary
                 )
             }
         },
@@ -47,9 +48,11 @@ fun AppConfirmDialog(
             TextButton(onClick = onDismiss) {
                 Text(
                     text = dismissText,
-                    style = AppTypography.labelMedium
+                    style = AppTypography.labelMedium,
+                    color = AppColors.onSurface
                 )
             }
-        }
+        },
+        containerColor = AppColors.surface
     )
 }

@@ -1,7 +1,9 @@
 package com.madar.madartask.ui.input
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.madar.madartask.R
 import com.madar.madartask.common.constants.AppConstants.MAX_AGE
 import com.madar.madartask.common.constants.AppConstants.MIN_AGE
 import com.madar.madartask.domin.usecase.SaveUserUseCase
@@ -13,10 +15,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 class InputViewModel @Inject constructor(
-    private val saveUserUseCase: SaveUserUseCase
+    private val saveUserUseCase: SaveUserUseCase,
+    private val application: Application
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(InputScreenState())
@@ -24,6 +26,8 @@ class InputViewModel @Inject constructor(
 
     private val _effect = MutableSharedFlow<InputEffect>()
     val effect = _effect.asSharedFlow()
+
+    private val context get() = application.applicationContext
 
     fun onEvent(event: InputEvent) {
         when (event) {
@@ -43,20 +47,20 @@ class InputViewModel @Inject constructor(
     }
 
     private fun validateName(name: String): String? {
-        return if (name.isBlank()) "Name is required" else null
+        return if (name.isBlank()) context.getString(R.string.error_name_required) else null
     }
 
     private fun validateAge(age: String): String? {
-        if (age.isBlank()) return "Age is required"
+        if (age.isBlank()) return context.getString(R.string.error_age_required)
         val ageInt = age.toIntOrNull()
-            ?: return "Age must be a number"
+            ?: return context.getString(R.string.error_age_must_be_number)
         if (ageInt !in MIN_AGE..MAX_AGE)
-            return "Age must be between $MIN_AGE and $MAX_AGE"
+            return context.getString(R.string.error_age_range, MIN_AGE, MAX_AGE)
         return null
     }
 
     private fun validateJob(job: String): String? {
-        return if (job.isBlank()) "Job title is required" else null
+        return if (job.isBlank()) context.getString(R.string.error_job_required) else null
     }
 
     private fun saveUser() = viewModelScope.launch {
@@ -66,13 +70,13 @@ class InputViewModel @Inject constructor(
             name = state.value.name,
             age = state.value.age,
             job = state.value.job,
-            gender = state.value.gender.label
+            gender = state.value.gender.getLabel(context)
         ).onSuccess {
             update { InputScreenState() }
             emitEffect(InputEffect.ShowSuccess)
         }.onFailure {
             update { copy(isLoading = false) }
-            emitEffect(InputEffect.ShowError(it.message ?: "Error"))
+            emitEffect(InputEffect.ShowError(it.message ?: context.getString(R.string.toast_error_generic)))
         }
     }
 

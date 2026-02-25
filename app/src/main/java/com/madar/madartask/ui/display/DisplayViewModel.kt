@@ -1,7 +1,9 @@
 package com.madar.madartask.ui.display
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.madar.madartask.R
 import com.madar.madartask.domin.model.User
 import com.madar.madartask.domin.usecase.DeleteAllUsersUseCase
 import com.madar.madartask.domin.usecase.DeleteUserUseCase
@@ -16,11 +18,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class DisplayViewModel @Inject constructor(
     private val getAllUsersUseCase: GetAllUsersUseCase,
     private val deleteUserUseCase: DeleteUserUseCase,
-    private val deleteAllUsersUseCase: DeleteAllUsersUseCase
+    private val deleteAllUsersUseCase: DeleteAllUsersUseCase,
+    private val application: Application
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DisplayScreenState())
@@ -28,6 +32,8 @@ class DisplayViewModel @Inject constructor(
 
     private val _effect = MutableSharedFlow<DisplayScreenEffect>()
     val effect: SharedFlow<DisplayScreenEffect> = _effect.asSharedFlow()
+
+    private val context get() = application.applicationContext
 
     init {
         loadUsers()
@@ -63,7 +69,11 @@ class DisplayViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _state.value = _state.value.copy(isLoading = false)
-                _effect.emit(DisplayScreenEffect.ShowError(e.message ?: "Unknown error"))
+                _effect.emit(
+                    DisplayScreenEffect.ShowError(
+                        e.message ?: context.getString(R.string.toast_error_unknown)
+                    )
+                )
             }
         }
     }
@@ -87,11 +97,19 @@ class DisplayViewModel @Inject constructor(
                     _effect.emit(DisplayScreenEffect.ShowDeleteSuccess(userToDelete.name))
                 }.onFailure { error ->
                     _state.value = _state.value.copy(userToDelete = null)
-                    _effect.emit(DisplayScreenEffect.ShowError(error.message ?: "Failed to delete"))
+                    _effect.emit(
+                        DisplayScreenEffect.ShowError(
+                            error.message ?: context.getString(R.string.toast_error_delete_failed)
+                        )
+                    )
                 }
             } catch (e: Exception) {
                 _state.value = _state.value.copy(userToDelete = null)
-                _effect.emit(DisplayScreenEffect.ShowError(e.message ?: "Unknown error"))
+                _effect.emit(
+                    DisplayScreenEffect.ShowError(
+                        e.message ?: context.getString(R.string.toast_error_unknown)
+                    )
+                )
             }
         }
     }
@@ -115,11 +133,19 @@ class DisplayViewModel @Inject constructor(
                     _effect.emit(DisplayScreenEffect.ShowDeleteAllSuccess(userCount))
                 }.onFailure { error ->
                     _state.value = _state.value.copy(showDeleteAllDialog = false)
-                    _effect.emit(DisplayScreenEffect.ShowError(error.message ?: "Failed to delete all"))
+                    _effect.emit(
+                        DisplayScreenEffect.ShowError(
+                            error.message ?: context.getString(R.string.toast_error_delete_all_failed)
+                        )
+                    )
                 }
             } catch (e: Exception) {
                 _state.value = _state.value.copy(showDeleteAllDialog = false)
-                _effect.emit(DisplayScreenEffect.ShowError(e.message ?: "Unknown error"))
+                _effect.emit(
+                    DisplayScreenEffect.ShowError(
+                        e.message ?: context.getString(R.string.toast_error_unknown)
+                    )
+                )
             }
         }
     }

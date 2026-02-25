@@ -15,20 +15,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,10 +36,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.madar.madartask.R
 import com.madar.madartask.common.ui.compose.AppConfirmDialog
+import com.madar.madartask.common.ui.theme.AppColors
 import com.madar.madartask.common.ui.theme.AppTypography
 import com.madar.madartask.domin.model.User
 
@@ -56,24 +59,37 @@ fun DisplayScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is DisplayScreenEffect.ShowDeleteSuccess -> {
-                    Toast.makeText(context, "${effect.userName} deleted", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.toast_user_deleted, effect.userName),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-
                 is DisplayScreenEffect.ShowDeleteAllSuccess -> {
-                    Toast.makeText(context, "${effect.count} users deleted", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.toast_users_deleted, effect.count),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-
                 is DisplayScreenEffect.ShowError -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
                 }
-
                 DisplayScreenEffect.NavigateToInput -> onNavigateToInput()
             }
         }
     }
 
     Scaffold(
-        topBar = { DisplayTopBar(userCount = state.userCount) }
+        topBar = {
+            DisplayTopBar(
+                userCount = state.userCount,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.surface,
+                    titleContentColor = AppColors.onSurface
+                )
+            )
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -90,9 +106,13 @@ fun DisplayScreen(
     // Delete user confirmation dialog
     if (state.userToDelete != null) {
         AppConfirmDialog(
-            title = "Delete User",
-            message = "Are you sure you want to delete ${state.userToDelete!!.name}?",
-            confirmText = "Delete",
+            title = stringResource(id = R.string.dialog_delete_user_title),
+            message = stringResource(
+                id = R.string.dialog_delete_user_message,
+                state.userToDelete!!.name
+            ),
+            confirmText = stringResource(id = R.string.button_delete),
+            dismissText = stringResource(id = R.string.button_cancel),
             isDestructive = true,
             onConfirm = {
                 viewModel.onEvent(DisplayEvent.OnConfirmDeleteUser)
@@ -106,9 +126,10 @@ fun DisplayScreen(
     // Delete all users confirmation dialog
     if (state.showDeleteAllDialog) {
         AppConfirmDialog(
-            title = "Delete All Users",
-            message = "Are you sure you want to delete all users? This action cannot be undone.",
-            confirmText = "Delete All",
+            title = stringResource(id = R.string.dialog_delete_all_title),
+            message = stringResource(id = R.string.dialog_delete_all_message),
+            confirmText = stringResource(id = R.string.button_delete_all),
+            dismissText = stringResource(id = R.string.button_cancel),
             isDestructive = true,
             onConfirm = {
                 viewModel.onEvent(DisplayEvent.OnConfirmDeleteAll)
@@ -122,9 +143,19 @@ fun DisplayScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DisplayTopBar(userCount: Int) {
+private fun DisplayTopBar(
+    userCount: Int,
+    colors: TopAppBarColors
+) {
     TopAppBar(
-        title = { Text("All Users ($userCount)", style = AppTypography.titleLarge) }
+        title = {
+            Text(
+                text = stringResource(id = R.string.display_screen_title, userCount),
+                style = AppTypography.titleLarge,
+                color = AppColors.onSurface
+            )
+        },
+        colors = colors
     )
 }
 
@@ -149,7 +180,9 @@ private fun LoadingState() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(
+            color = AppColors.primary
+        )
     }
 }
 
@@ -161,14 +194,22 @@ private fun EmptyState(onEvent: (DisplayEvent) -> Unit) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "No users found",
-                style = AppTypography.titleLarge
+                text = stringResource(id = R.string.empty_state_title),
+                style = AppTypography.titleLarge,
+                color = AppColors.onSurface
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { onEvent(DisplayEvent.OnNavigateToInput) }
+                onClick = { onEvent(DisplayEvent.OnNavigateToInput) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = AppColors.primary,
+                    contentColor = AppColors.onPrimary
+                )
             ) {
-                Text("Add First User", style = AppTypography.labelMedium)
+                Text(
+                    text = stringResource(id = R.string.button_add_first_user),
+                    style = AppTypography.labelMedium
+                )
             }
         }
     }
@@ -224,6 +265,9 @@ private fun UserListItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = AppColors.onSecondary
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -245,21 +289,28 @@ private fun UserInfo(user: User, modifier: Modifier = Modifier) {
         Text(
             text = user.name,
             style = AppTypography.titleLarge,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = AppColors.onSurface
         )
         Spacer(modifier = Modifier.height(4.dp))
-        UserDetailText(label = "Age", value = user.age.toString())
-        UserDetailText(label = "Job", value = user.jobTitle)
-        UserDetailText(label = "Gender", value = user.gender)
+        UserDetailText(
+            label = stringResource(id = R.string.user_detail_age, user.age.toString())
+        )
+        UserDetailText(
+            label = stringResource(id = R.string.user_detail_job, user.jobTitle)
+        )
+        UserDetailText(
+            label = stringResource(id = R.string.user_detail_gender, user.gender)
+        )
     }
 }
 
 @Composable
-private fun UserDetailText(label: String, value: String) {
+private fun UserDetailText(label: String) {
     Text(
-        text = "$label: $value",
+        text = label,
         style = AppTypography.bodyLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        color = AppColors.onSurfaceVariant
     )
 }
 
@@ -268,8 +319,8 @@ private fun DeleteButton(onDelete: () -> Unit) {
     IconButton(onClick = onDelete) {
         Icon(
             imageVector = Icons.Default.Delete,
-            contentDescription = "Delete user",
-            tint = MaterialTheme.colorScheme.error
+            contentDescription = stringResource(id = R.string.content_desc_delete_user),
+            tint = AppColors.error
         )
     }
 }
@@ -287,9 +338,16 @@ private fun ActionButtons(
             onClick = { onEvent(DisplayEvent.OnNavigateToInput) },
             modifier = Modifier
                 .weight(1f)
-                .height(48.dp)
+                .height(48.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AppColors.primary,
+                contentColor = AppColors.onPrimary
+            )
         ) {
-            Text("Add User", style = AppTypography.labelMedium)
+            Text(
+                text = stringResource(id = R.string.button_add_user),
+                style = AppTypography.labelMedium
+            )
         }
 
         OutlinedButton(
@@ -298,8 +356,11 @@ private fun ActionButtons(
                 .weight(1f)
                 .height(48.dp)
         ) {
-            Text("Delete All", style = AppTypography.labelMedium)
+            Text(
+                text = stringResource(id = R.string.button_delete_all),
+                style = AppTypography.labelMedium,
+                color = AppColors.error
+            )
         }
     }
 }
-
